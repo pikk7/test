@@ -6,7 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const SearchForm = () => {
   const [movie, setMovie] = useState(null)
-  const [movies, setMovies] = useState([])
+  const [movies, setMovies] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const handleSearch = (event) => {
@@ -25,13 +25,30 @@ const SearchForm = () => {
                       id
                       name
                       releaseDate
+                      score
+                      genres {
+                        name
+                        id
+                      }
+                      similar{
+                        id
+                        name
+                        releaseDate
+                        score
+                        genres {
+                          name
+                          id
+                        }   
+                      }
                     }
                   }
                   `
       })
     })
       .then(res => res.json())
-      .then(res => setMovies(res?.data?.searchMovies))
+      .then(res => {
+        setMovies(res?.data?.searchMovies || [])
+      })
       .then(() => setLoading(false))
   }
 
@@ -49,8 +66,10 @@ const SearchForm = () => {
 
       {loading && <CircularProgress />}
       <div className='container'>
-        {movies && !loading && movies.map(movie => <Movie key={movie.id} movie={movie} />)}
-
+        {movies && !loading && movies.map(movie => <Movie setMovies={setMovies} key={movie.id} movie={movie} />)}
+        {movies && movies.length === 0 &&
+          <div>Sorry, We didn't find this movie.</div>
+        }
       </div>
     </>
   );
